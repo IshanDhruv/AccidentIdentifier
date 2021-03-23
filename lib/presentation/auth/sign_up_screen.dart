@@ -61,7 +61,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           },
                         ),
                         SizedBox(height: 20),
-                        RaisedButton(
+                        ElevatedButton(
                             child: Text("Register"),
                             onPressed: () async {
                               if (_formKey.currentState.validate()) {
@@ -105,10 +105,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Container(
       margin: EdgeInsets.all(20),
       height: 50,
-      child: RaisedButton(
-        shape: RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(30.0)),
-        color: Colors.red[400],
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          primary: Colors.red[400],
+          shape: RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(30.0)),
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [

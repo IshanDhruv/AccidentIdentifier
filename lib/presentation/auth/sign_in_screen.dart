@@ -1,4 +1,3 @@
-import 'package:accident_identifier/presentation/home_screen.dart';
 import 'package:accident_identifier/services/auth.dart';
 import 'package:flutter/material.dart';
 
@@ -115,43 +114,29 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Widget _signInButton() {
-    return OutlineButton(
-      splashColor: Colors.grey,
-      onPressed: () {
-        auth.signInWithGoogle().then((result) {
-          if (result != null) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) {
-                  return HomeScreen();
-                },
-              ),
-            );
-          }
-        });
-      },
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-      highlightElevation: 0,
-      borderSide: BorderSide(color: Colors.grey),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+    return Container(
+      margin: EdgeInsets.all(20),
+      height: 50,
+      child: RaisedButton(
+        shape: RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(30.0)),
+        color: Colors.red[400],
         child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Image(image: AssetImage("assets/images/g_logo.png"), height: 35.0),
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Text(
-                'Sign in with Google',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.grey,
-                ),
-              ),
-            )
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Image.asset(
+              'assets/google_logo.png',
+              height: 30,
+            ),
+            Text(
+              "Sign in with Google",
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
           ],
         ),
+        onPressed: () {
+          auth.signInWithGoogle();
+        },
       ),
     );
   }

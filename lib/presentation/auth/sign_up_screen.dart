@@ -25,18 +25,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         : Scaffold(
             appBar: AppBar(
               title: Text("Register"),
-              actions: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(right: 20),
-                  child: GestureDetector(
-                    child:
-                        Tooltip(child: Icon(Icons.person), message: "Sign in"),
-                    onTap: () async {
-                      widget.toggleView();
-                    },
-                  ),
-                )
-              ],
             ),
             body: SingleChildScrollView(
               child: Container(
@@ -91,11 +79,53 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               }
                             }),
                         SizedBox(height: 20),
+                        GestureDetector(
+                          child: Text(
+                            "Already have an account? Sign in",
+                            style: TextStyle(
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                          onTap: () {
+                            widget.toggleView();
+                          },
+                        ),
+                        SizedBox(height: 20),
+                        _signUpButton(),
+                        SizedBox(height: 20),
                         Text(error),
                       ],
                     ),
                   )),
             ),
           );
+  }
+
+  Widget _signUpButton() {
+    return Container(
+      margin: EdgeInsets.all(20),
+      height: 50,
+      child: RaisedButton(
+        shape: RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(30.0)),
+        color: Colors.red[400],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Image.asset(
+              'assets/google_logo.png',
+              height: 30,
+            ),
+            Text(
+              "Sign in with Google",
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+          ],
+        ),
+        onPressed: () {
+          auth.signInWithGoogle();
+        },
+      ),
+    );
   }
 }

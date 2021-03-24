@@ -1,6 +1,7 @@
-import 'package:accident_identifier/services/auth.dart';
+import 'package:accident_identifier/providers/auth_providers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -11,8 +12,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  Auth auth = Auth();
-
   int _selectedIndex = 0;
   void _onItemTapped(int index) {
     setState(() {
@@ -26,9 +25,13 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text("Accident Identifier"),
         actions: [
-          IconButton(
-            icon: Icon(Icons.exit_to_app),
-            onPressed: () => auth.signOut(),
+          Consumer(
+            builder: (context, watch, child) {
+              final _auth = watch(authServicesProvider);
+              return IconButton(
+                  icon: Icon(Icons.exit_to_app),
+                  onPressed: () => _auth.signOut());
+            },
           )
         ],
       ),

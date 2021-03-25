@@ -1,13 +1,18 @@
+import 'package:accident_identifier/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class Auth {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  CustomUser _user;
 
   Stream<User> get authStateChange => _auth.authStateChanges();
 
-  // User get user => _auth.userChanges();
+  Stream<CustomUser> get user async* {
+    _user = CustomUser(user: _auth.currentUser);
+    yield _user;
+  }
 
   Future signInWithGoogle() async {
     final GoogleSignInAccount googleSignInAccount =

@@ -1,5 +1,5 @@
+import 'package:accident_identifier/models/user.dart';
 import 'package:accident_identifier/providers/auth_providers.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,8 +12,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, watch, child) {
-      final _authState = watch(authStateProvider);
-      return _authState.when(
+      final _userState = watch(userProvider);
+      return _userState.when(
         data: (value) {
           if (value != null)
             return _userProfile(value);
@@ -27,14 +27,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         },
         error: (error, stackTrace) {
           return Center(
-            child: Text("Something went wrong. :("),
+            child: Text(error),
           );
         },
       );
     });
   }
 
-  Widget _userProfile(User user) {
+  Widget _userProfile(CustomUser user) {
     return Container(
       margin: EdgeInsets.all(15),
       child: Column(
@@ -45,7 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(50),
             child: Image.network(
-              user.photoURL,
+              user.user.photoURL,
             ),
           ),
           SizedBox(height: 40),

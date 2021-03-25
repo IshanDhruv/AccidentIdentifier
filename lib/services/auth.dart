@@ -7,6 +7,8 @@ class Auth {
 
   Stream<User> get authStateChange => _auth.authStateChanges();
 
+  // User get user => _auth.userChanges();
+
   Future signInWithGoogle() async {
     final GoogleSignInAccount googleSignInAccount =
         await _googleSignIn.signIn();

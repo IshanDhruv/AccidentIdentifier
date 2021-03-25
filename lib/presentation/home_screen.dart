@@ -1,12 +1,9 @@
 import 'package:accident_identifier/providers/auth_providers.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:accident_identifier/presentation/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final User user;
-
-  HomeScreen({this.user});
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -18,6 +15,20 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedIndex = index;
     });
   }
+
+  static List<Widget> _widgetOptions = <Widget>[
+    Center(
+      child: Text(
+        'Home',
+      ),
+    ),
+    Center(
+      child: Text(
+        'Contacts',
+      ),
+    ),
+    ProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
+      body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

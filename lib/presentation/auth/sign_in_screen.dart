@@ -1,4 +1,4 @@
-import 'package:accident_identifier/presentation/home_screen.dart';
+import 'package:accident_identifier/presentation/base_screen.dart';
 import 'package:accident_identifier/providers/auth_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -92,7 +92,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      HomeScreen()));
+                                                      BaseScreen()));
                                         }
                                       }
                                     }),

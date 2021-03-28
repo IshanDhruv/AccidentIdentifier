@@ -27,7 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         },
         error: (error, stackTrace) {
           return Center(
-            child: Text(error),
+            child: Text(error.toString()),
           );
         },
       );

@@ -15,7 +15,22 @@ class Auth {
   }
 
   Stream<CustomUser> get user async* {
-    yield _user;
+    try {
+      String url = BaseUrl + UserGroup + UserProfileRoute;
+      String token = sharedPreferences.getString('userToken');
+      var response = await http.get(Uri.parse(url), headers: {
+        HttpHeaders.authorizationHeader: '$token',
+      });
+      if (response.statusCode == 200) {
+        var body = jsonDecode(response.body);
+        _user = CustomUser.fromJson(body);
+        yield _user;
+      } else {
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future signUp(

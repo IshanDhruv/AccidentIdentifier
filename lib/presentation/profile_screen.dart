@@ -42,12 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           SizedBox(height: 80),
           Container(),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(50),
-            child: Image.network(
-              user.user.photoURL,
-            ),
-          ),
+          Text(user.name),
           SizedBox(height: 40),
         ],
       ),

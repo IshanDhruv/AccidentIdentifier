@@ -1,72 +1,80 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:accident_identifier/models/user.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:accident_identifier/services/api_routes.dart';
+import 'package:accident_identifier/services/shared_prefs.dart';
+import 'package:http/http.dart' as http;
 
 class Auth {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
   CustomUser _user;
 
-  Stream<User> get authStateChange => _auth.authStateChanges();
+  Future<String> get userToken async {
+    String _userToken = sharedPreferences.getString('userToken');
+    return _userToken;
+  }
 
   Stream<CustomUser> get user async* {
-    _user = CustomUser(user: _auth.currentUser);
     yield _user;
   }
 
-  Future signInWithGoogle() async {
-    final GoogleSignInAccount googleSignInAccount =
-        await _googleSignIn.signIn();
-    final GoogleSignInAuthentication googleSignInAuthentication =
-        await googleSignInAccount.authentication;
+  Future signUp(
+      String name, String email, String phoneNumber, String password) async {
+    String url = BaseUrl + UserGroup + UserSignUpRoute;
+    var response = await http.post(Uri.parse(url),
+        headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+        },
+        body: jsonEncode({
+          'name': name,
+          'number': '+91' + phoneNumber,
+          'password': password,
+          'email': email,
+        }));
+    print(response.statusCode);
 
-    final AuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleSignInAuthentication.accessToken,
-      idToken: googleSignInAuthentication.idToken,
-    );
+    if (response.statusCode == 200) {
+      var body = jsonDecode(response.body);
+      _user = CustomUser.fromJson(body['user']);
+      sharedPreferences.setString('userToken', body['token']);
+      return true;
+    } else
+      print(response.body);
+  }
 
-    final UserCredential authResult =
-        await _auth.signInWithCredential(credential);
-    final User user = authResult.user;
-
-    if (user != null) {
-      assert(!user.isAnonymous);
-      assert(await user.getIdToken() != null);
-
-      final User currentUser = _auth.currentUser;
-      assert(user.uid == currentUser.uid);
-
-      print('signInWithGoogle succeeded.');
-    }
+  Future signIn(String email, String password) async {
+    String url = BaseUrl + UserGroup + UserSignInRoute;
+    var response = await http.post(Uri.parse(url),
+        headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+        },
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+        }));
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      var body = jsonDecode(response.body);
+      _user = CustomUser.fromJson(body['user']);
+      sharedPreferences.setString('userToken', body['token']);
+      return true;
+    } else
+      print(response.body);
   }
 
   Future signOut() async {
-    await _googleSignIn.signOut();
-    _auth.signOut();
-    print("User Signed Out");
-  }
-
-  Future registerWithEmailAndPassword(String email, String password) async {
-    try {
-      UserCredential result = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      User user = result.user;
-      return user;
-    } catch (e) {
-      print(e);
-      return null;
-    }
-  }
-
-  Future signInWithEmailAndPassword(String email, String password) async {
-    try {
-      UserCredential result = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      User user = result.user;
-      return user;
-    } catch (e) {
-      print(e);
-      return null;
+    String url = BaseUrl + UserGroup + UserSignOutAllRoute;
+    String token = sharedPreferences.getString('userToken');
+    var response = await http.get(
+      Uri.parse(url),
+      headers: {
+        HttpHeaders.contentTypeHeader: "application/json",
+        HttpHeaders.authorizationHeader: '$token',
+      },
+    );
+    if (response.statusCode == 200) {
+      sharedPreferences.remove('userToken');
+      return true;
     }
   }
 }

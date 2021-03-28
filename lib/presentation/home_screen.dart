@@ -1,3 +1,4 @@
+import 'package:accident_identifier/presentation/auth/authenticate.dart';
 import 'package:accident_identifier/providers/auth_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,9 +40,18 @@ class _HomeScreenState extends State<HomeScreen> {
           Consumer(
             builder: (context, watch, child) {
               final _auth = watch(authServicesProvider);
+
               return IconButton(
                   icon: Icon(Icons.exit_to_app),
-                  onPressed: () => _auth.signOut());
+                  onPressed: () {
+                    _auth.signOut().then((value) {
+                      if (value == true)
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Authenticate()));
+                    });
+                  });
             },
           )
         ],

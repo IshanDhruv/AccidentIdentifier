@@ -1,7 +1,19 @@
-import 'package:firebase_auth/firebase_auth.dart';
-
 class CustomUser {
-  final User user;
+  String id;
+  String name;
+  String phoneNumber;
+  String email;
+  List contacts;
+  List hospitals;
 
-  CustomUser({this.user});
+  CustomUser({this.id, this.name, this.phoneNumber, this.email});
+
+  CustomUser.fromJson(Map<String, dynamic> json) {
+    id = json['_id'];
+    name = json['name'];
+    phoneNumber = json['number'];
+    email = json['email'];
+    contacts = json['notifyContacts'];
+    hospitals = json['hospitals'];
+  }
 }

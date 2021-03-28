@@ -1,3 +1,4 @@
+import 'package:accident_identifier/presentation/home_screen.dart';
 import 'package:accident_identifier/providers/auth_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +13,9 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  String _name = '';
   String _email = '';
+  String _phoneNumber = '';
   String _password = '';
   String error = '';
   bool isLoading = false;
@@ -20,21 +23,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return isLoading
-        ? Center(child: CircularProgressIndicator())
-        : Consumer(builder: (context, watch, child) {
-            final _auth = watch(authServicesProvider);
-            return Scaffold(
-              appBar: AppBar(
-                title: Text("Register"),
-              ),
-              body: SingleChildScrollView(
+    return Consumer(builder: (context, watch, child) {
+      final _auth = watch(authServicesProvider);
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Register"),
+        ),
+        body: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
                 child: Container(
                     padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
                     child: Form(
                       key: _formKey,
                       child: Column(
                         children: <Widget>[
+                          SizedBox(height: 20),
+                          TextFormField(
+                            autofocus: true,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                                labelText: "Name",
+                                border: OutlineInputBorder()),
+                            validator: (val) =>
+                                val.isEmpty ? 'Enter your name' : null,
+                            onChanged: (val) {
+                              setState(() {
+                                _name = val;
+                              });
+                            },
+                          ),
                           SizedBox(height: 20),
                           TextFormField(
                             autofocus: true,
@@ -52,6 +70,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           SizedBox(height: 20),
                           TextFormField(
+                            keyboardType: TextInputType.phone,
+                            decoration: InputDecoration(
+                                labelText: "Phone Number",
+                                border: OutlineInputBorder()),
+                            validator: (val) => val.length != 10
+                                ? 'Phone number should be 10 characters'
+                                : null,
+                            onChanged: (val) {
+                              _phoneNumber = val;
+                            },
+                          ),
+                          SizedBox(height: 20),
+                          TextFormField(
                             obscureText: true,
                             decoration: InputDecoration(
                                 labelText: "Password",
@@ -65,20 +96,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           SizedBox(height: 20),
                           ElevatedButton(
-                              child: Text("Register"),
+                              child: Text("Sign Up"),
                               onPressed: () async {
                                 if (_formKey.currentState.validate()) {
                                   setState(() {
                                     isLoading = true;
                                   });
-                                  var result =
-                                      await _auth.registerWithEmailAndPassword(
-                                          _email, _password);
+                                  var result = await _auth.signUp(
+                                      _name, _email, _phoneNumber, _password);
                                   if (result == null)
                                     setState(() {
-                                      error = 'Need valid email and password';
+                                      error = 'Need valid credentials';
                                       isLoading = false;
                                     });
+                                  else {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                HomeScreen()));
+                                  }
                                 }
                               }),
                           SizedBox(height: 20),
@@ -93,47 +130,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               widget.toggleView();
                             },
                           ),
-                          SizedBox(height: 20),
-                          _signUpButton(),
-                          SizedBox(height: 20),
-                          Text(error),
                         ],
                       ),
                     )),
               ),
-            );
-          });
-  }
-
-  Widget _signUpButton() {
-    return Consumer(builder: (context, watch, child) {
-      final _auth = watch(authServicesProvider);
-      return Container(
-        margin: EdgeInsets.all(20),
-        height: 50,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            primary: Colors.red[400],
-            shape: RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(30.0)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Image.asset(
-                'assets/google_logo.png',
-                height: 30,
-              ),
-              Text(
-                "Sign in with Google",
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-            ],
-          ),
-          onPressed: () {
-            _auth.signInWithGoogle();
-          },
-        ),
       );
     });
   }

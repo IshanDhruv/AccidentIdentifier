@@ -1,3 +1,4 @@
+import 'package:accident_identifier/presentation/home_screen.dart';
 import 'package:accident_identifier/providers/auth_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -79,14 +80,20 @@ class _SignInScreenState extends State<SignInScreen> {
                                           isLoading = true;
                                         });
                                         print('valid');
-                                        var result = await _auth
-                                            .signInWithEmailAndPassword(
-                                                _email, _password);
+                                        var result = await _auth.signIn(
+                                            _email, _password);
                                         if (result == null)
                                           setState(() {
                                             error = 'Couldnt sign in';
                                             isLoading = false;
                                           });
+                                        else {
+                                          Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      HomeScreen()));
+                                        }
                                       }
                                     }),
                                 SizedBox(height: 20),
@@ -106,49 +113,11 @@ class _SignInScreenState extends State<SignInScreen> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 50),
-                          _signInButton(),
                         ],
                       ),
                     ),
                   ),
                 ),
-        );
-      },
-    );
-  }
-
-  Widget _signInButton() {
-    return Consumer(
-      builder: (context, watch, child) {
-        final _auth = watch(authServicesProvider);
-        return Container(
-          margin: EdgeInsets.all(20),
-          height: 50,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              primary: Colors.red[400],
-              shape: RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(30.0),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Image.asset(
-                  'assets/google_logo.png',
-                  height: 30,
-                ),
-                Text(
-                  "Sign in with Google",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
-              ],
-            ),
-            onPressed: () {
-              _auth.signInWithGoogle();
-            },
-          ),
         );
       },
     );

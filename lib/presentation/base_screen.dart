@@ -1,4 +1,5 @@
 import 'package:accident_identifier/presentation/auth/authenticate.dart';
+import 'package:accident_identifier/presentation/contacts_screen.dart';
 import 'package:accident_identifier/providers/auth_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,11 +22,7 @@ class _BaseScreenState extends State<BaseScreen> {
 
   static List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
-    Center(
-      child: Text(
-        'Contacts',
-      ),
-    ),
+    ContactsScreen(),
     ProfileScreen(),
   ];
 

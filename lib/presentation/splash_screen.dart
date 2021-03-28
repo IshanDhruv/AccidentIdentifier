@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'auth/authenticate.dart';
-import 'home_screen.dart';
+import 'base_screen.dart';
 
 class SplashScreen extends ConsumerWidget {
   @override
@@ -12,7 +12,7 @@ class SplashScreen extends ConsumerWidget {
     return _authState.when(
       data: (value) {
         if (value != null)
-          return HomeScreen();
+          return BaseScreen();
         else
           return Authenticate();
       },

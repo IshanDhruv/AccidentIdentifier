@@ -1,3 +1,4 @@
+import 'package:accident_identifier/models/contact.dart';
 import 'package:accident_identifier/models/hospital.dart';
 import 'package:accident_identifier/models/user.dart';
 import 'package:accident_identifier/providers/user_provider.dart';
@@ -115,9 +116,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   Widget _friendsUI(CustomUser user) {
-    List<CustomUser> _contacts = [
-      CustomUser(name: "Harshul", phoneNumber: "+911234567890"),
-      CustomUser(name: "Harshul", phoneNumber: "+911234567890"),
+    List<Contact> _contacts = [
+      Contact(
+          name: "Harshul", phoneNumber: "+911234567890", relation: "Brother"),
+      Contact(
+          name: "Harshul", phoneNumber: "+911234567890", relation: "Friend"),
     ];
     return Container(
       child: ListView.builder(
@@ -138,7 +141,13 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   _contacts[index].name,
                   style: TextStyle(fontSize: 24),
                 ),
-                Text(_contacts[index].phoneNumber),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(_contacts[index].relation),
+                    Text(_contacts[index].phoneNumber),
+                  ],
+                ),
               ],
             ),
           );

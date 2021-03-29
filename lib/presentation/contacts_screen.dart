@@ -1,3 +1,4 @@
+import 'package:accident_identifier/models/hospital.dart';
 import 'package:accident_identifier/models/user.dart';
 import 'package:accident_identifier/providers/user_provider.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ class ContactsScreen extends StatefulWidget {
 }
 
 class _ContactsScreenState extends State<ContactsScreen> {
+  int _state = 0;
+
   @override
   Widget build(BuildContext context) {
     return Consumer(
@@ -37,7 +40,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   Widget _contactsUI(CustomUser user) {
-    int _state = 0;
     return Container(
       margin: EdgeInsets.all(15),
       child: Column(children: [
@@ -54,6 +56,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 width: 150,
                 height: 30,
                 decoration: BoxDecoration(
+                  color: _state == 0 ? Colors.black : Colors.white,
                   border: Border.all(),
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(5),
@@ -61,7 +64,12 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   ),
                 ),
                 child: Center(
-                  child: Text("Friends and Family"),
+                  child: Text(
+                    "Friends and Family",
+                    style: TextStyle(
+                      color: _state == 0 ? Colors.white : Colors.black,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -75,19 +83,33 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 width: 150,
                 height: 30,
                 decoration: BoxDecoration(
+                    color: _state == 1 ? Colors.black : Colors.white,
                     border: Border.all(),
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(5),
                       bottomRight: Radius.circular(5),
                     )),
                 child: Center(
-                  child: Text("Hospitals"),
+                  child: Text(
+                    "Hospitals",
+                    style: TextStyle(
+                      color: _state == 1 ? Colors.white : Colors.black,
+                    ),
+                  ),
                 ),
               ),
             ),
           ],
         ),
-        _friendsUI(user)
+        SizedBox(height: 30),
+        Builder(
+          builder: (context) {
+            if (_state == 0)
+              return _friendsUI(user);
+            else
+              return _hospitalsUI(user);
+          },
+        )
       ]),
     );
   }
@@ -117,6 +139,51 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   style: TextStyle(fontSize: 24),
                 ),
                 Text(_contacts[index].phoneNumber),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _hospitalsUI(CustomUser user) {
+    List<Hospital> _hospitals = [
+      Hospital(
+          title: "Presbyterian Hospital",
+          location: 'New York metropolitan area',
+          phoneNumber: "+911234567890"),
+      Hospital(
+          title: "Presbyterian Hospital",
+          location: 'New York metropolitan area',
+          phoneNumber: "+911234567890"),
+    ];
+    return Container(
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: _hospitals.length,
+        itemBuilder: (context, index) {
+          return Container(
+            decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: EdgeInsets.all(5),
+            margin: EdgeInsets.all(5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _hospitals[index].title,
+                  style: TextStyle(fontSize: 24),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(_hospitals[index].location),
+                    Text(_hospitals[index].phoneNumber),
+                  ],
+                ),
               ],
             ),
           );

@@ -6,7 +6,13 @@ class CustomUser {
   List contacts;
   List hospitals;
 
-  CustomUser({this.id, this.name, this.phoneNumber, this.email});
+  CustomUser(
+      {this.id,
+      this.name,
+      this.phoneNumber,
+      this.email,
+      this.contacts,
+      this.hospitals});
 
   CustomUser.fromJson(Map<String, dynamic> json) {
     id = json['_id'];

@@ -2,6 +2,7 @@ import 'package:accident_identifier/models/contact.dart';
 import 'package:accident_identifier/models/hospital.dart';
 import 'package:accident_identifier/models/user.dart';
 import 'package:accident_identifier/providers/user_provider.dart';
+import 'package:accident_identifier/services/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,12 +13,15 @@ class ContactsScreen extends StatefulWidget {
 
 class _ContactsScreenState extends State<ContactsScreen> {
   int _state = 0;
+  var _user;
+  UserRepository _userRepo;
 
   @override
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, watch, child) {
-        final _user = watch(userProvider);
+        _user = watch(userProvider);
+        _userRepo = watch(userServicesProvider);
         return _user.when(
           data: (value) {
             if (value != null)
@@ -41,77 +45,83 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   Widget _contactsUI(CustomUser user) {
-    return Container(
-      margin: EdgeInsets.all(15),
-      child: Column(children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _state = 0;
-                });
-              },
-              child: Container(
-                width: 150,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: _state == 0 ? Colors.black : Colors.white,
-                  border: Border.all(),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(5),
-                    bottomLeft: Radius.circular(5),
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    "Friends and Family",
-                    style: TextStyle(
-                      color: _state == 0 ? Colors.white : Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _state = 1;
-                });
-              },
-              child: Container(
-                width: 150,
-                height: 30,
-                decoration: BoxDecoration(
-                    color: _state == 1 ? Colors.black : Colors.white,
+    return Scaffold(
+      body: Container(
+        margin: EdgeInsets.all(15),
+        child: Column(children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _state = 0;
+                  });
+                },
+                child: Container(
+                  width: 150,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: _state == 0 ? Colors.black : Colors.white,
                     border: Border.all(),
                     borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(5),
-                      bottomRight: Radius.circular(5),
-                    )),
-                child: Center(
-                  child: Text(
-                    "Hospitals",
-                    style: TextStyle(
-                      color: _state == 1 ? Colors.white : Colors.black,
+                      topLeft: Radius.circular(5),
+                      bottomLeft: Radius.circular(5),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "Friends and Family",
+                      style: TextStyle(
+                        color: _state == 0 ? Colors.white : Colors.black,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 30),
-        Builder(
-          builder: (context) {
-            if (_state == 0)
-              return _friendsUI(user);
-            else
-              return _hospitalsUI(user);
-          },
-        )
-      ]),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _state = 1;
+                  });
+                },
+                child: Container(
+                  width: 150,
+                  height: 30,
+                  decoration: BoxDecoration(
+                      color: _state == 1 ? Colors.black : Colors.white,
+                      border: Border.all(),
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(5),
+                        bottomRight: Radius.circular(5),
+                      )),
+                  child: Center(
+                    child: Text(
+                      "Hospitals",
+                      style: TextStyle(
+                        color: _state == 1 ? Colors.white : Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 30),
+          Builder(
+            builder: (context) {
+              if (_state == 0)
+                return _friendsUI(user);
+              else
+                return _hospitalsUI(user);
+            },
+          )
+        ]),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: Icon(Icons.person_add),
+      ),
     );
   }
 
@@ -122,6 +132,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
       Contact(
           name: "Harshul", phoneNumber: "+911234567890", relation: "Friend"),
     ];
+    print("userss");
+    print(user.contacts.length);
     return Container(
       child: ListView.builder(
         shrinkWrap: true,
@@ -138,7 +150,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _contacts[index].name,
+                  user.contacts.length.toString(),
                   style: TextStyle(fontSize: 24),
                 ),
                 Row(

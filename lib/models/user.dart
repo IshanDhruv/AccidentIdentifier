@@ -1,9 +1,11 @@
+import 'package:accident_identifier/models/contact.dart';
+
 class CustomUser {
   String id;
   String name;
   String phoneNumber;
   String email;
-  List contacts;
+  List<Contact> contacts;
   List hospitals;
 
   CustomUser(
@@ -19,7 +21,12 @@ class CustomUser {
     name = json['name'];
     phoneNumber = json['number'];
     email = json['email'];
-    contacts = json['notifyContacts'];
+    if (json['notifyContacts'] != null) {
+      contacts = <Contact>[];
+      json['notifyContacts'].forEach((c) {
+        contacts.add(Contact.fromJson(c));
+      });
+    }
     hospitals = json['hospitals'];
   }
 }

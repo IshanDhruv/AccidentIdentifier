@@ -9,3 +9,6 @@ const String UserProfileRoute = '/me';
 
 const String ContactGroup = '/contact';
 const String AddContactRoute = '/addone';
+
+const String HospitalGroup = '/hospital';
+const String AddHospitalRoute = '/addone';

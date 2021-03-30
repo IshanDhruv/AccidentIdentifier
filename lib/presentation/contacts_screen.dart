@@ -15,6 +15,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
   int _state = 0;
   var _userStream;
   var _contactsStream;
+  var _hospitalsStream;
   UserRepository _userRepo;
 
   @override
@@ -23,6 +24,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
       builder: (context, watch, child) {
         _userStream = watch(userProvider);
         _contactsStream = watch(contactsProvider);
+        _hospitalsStream = watch(hospitalsProvider);
         _userRepo = watch(userServicesProvider);
         return _userStream.when(
           data: (user) {
@@ -122,7 +124,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showInputDialog();
+          _showInputDialog(_state);
         },
         child: Icon(Icons.person_add),
       ),
@@ -185,100 +187,169 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   Widget _hospitalsUI(CustomUser user) {
-    List<Hospital> _hospitals = [
-      Hospital(
-          title: "Presbyterian Hospital",
-          location: 'New York metropolitan area',
-          phoneNumber: "+911234567890"),
-      Hospital(
-          title: "Presbyterian Hospital",
-          location: 'New York metropolitan area',
-          phoneNumber: "+911234567890"),
-    ];
-    return Container(
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: _hospitals.length,
-        itemBuilder: (context, index) {
-          return Container(
-            decoration: BoxDecoration(
-              border: Border.all(),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: EdgeInsets.all(5),
-            margin: EdgeInsets.all(5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _hospitals[index].title,
-                  style: TextStyle(fontSize: 24),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(_hospitals[index].location),
-                    Text(_hospitals[index].phoneNumber),
-                  ],
-                ),
-              ],
-            ),
+    return _hospitalsStream.when(
+      data: (hospitals) {
+        if (hospitals != null) {
+          if (hospitals.isNotEmpty)
+            return Container(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: hospitals.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: EdgeInsets.all(5),
+                    margin: EdgeInsets.all(5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          hospitals[index].name,
+                          style: TextStyle(fontSize: 24),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(hospitals[index].location ?? ''),
+                            Text(hospitals[index].phoneNumber ?? ''),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            );
+          else
+            return Center(
+              child: Text("Please add a hospital."),
+            );
+        } else
+          return Center(
+            child: Text("Something went wrong. :("),
           );
-        },
-      ),
+      },
+      loading: () {
+        return Center(child: CircularProgressIndicator());
+      },
+      error: (error, stackTrace) {
+        return Center(
+          child: Text(error.toString()),
+        );
+      },
     );
   }
 
-  _showInputDialog() {
+  _showInputDialog(int state) {
     String _name;
     String _email;
     String _phoneNumber;
+    String _address;
 
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Add Contact"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              decoration: new InputDecoration(hintText: "Name"),
-              onChanged: (value) {
+    if (state == 0)
+      return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Add Contact"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: new InputDecoration(hintText: "Name"),
+                onChanged: (value) {
+                  setState(() {
+                    _name = value;
+                  });
+                },
+              ),
+              TextField(
+                decoration: new InputDecoration(hintText: "Location"),
+                onChanged: (value) {
+                  setState(() {
+                    _email = value;
+                  });
+                },
+              ),
+              TextField(
+                decoration: new InputDecoration(hintText: "Phone  Number"),
+                onChanged: (value) {
+                  setState(() {
+                    _phoneNumber = value;
+                  });
+                },
+              ),
+            ],
+          ),
+          actions: [
+            OutlinedButton(
+              child: Text('Add Contact'),
+              onPressed: () {
                 setState(() {
-                  _name = value;
-                });
-              },
-            ),
-            TextField(
-              decoration: new InputDecoration(hintText: "Email"),
-              onChanged: (value) {
-                setState(() {
-                  _email = value;
-                });
-              },
-            ),
-            TextField(
-              decoration: new InputDecoration(hintText: "Phone  Number"),
-              onChanged: (value) {
-                setState(() {
-                  _phoneNumber = value;
+                  _userRepo.addContact(_name, _email, _phoneNumber);
+                  Navigator.pop(context);
                 });
               },
             ),
           ],
         ),
-        actions: [
-          OutlinedButton(
-            child: Text('Add Contact'),
-            onPressed: () {
-              setState(() {
-                _userRepo.addContact(_name, _email, _phoneNumber);
-                Navigator.pop(context);
-              });
-            },
+      );
+    else
+      return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Add Hospital"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: new InputDecoration(hintText: "Name"),
+                onChanged: (value) {
+                  setState(() {
+                    _name = value;
+                  });
+                },
+              ),
+              TextField(
+                decoration: new InputDecoration(hintText: "Email"),
+                onChanged: (value) {
+                  setState(() {
+                    _email = value;
+                  });
+                },
+              ),
+              TextField(
+                decoration: new InputDecoration(hintText: "Phone  Number"),
+                onChanged: (value) {
+                  setState(() {
+                    _phoneNumber = value;
+                  });
+                },
+              ),
+              TextField(
+                decoration: new InputDecoration(hintText: "Address"),
+                onChanged: (value) {
+                  setState(() {
+                    _address = value;
+                  });
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+          actions: [
+            OutlinedButton(
+              child: Text('Add Hospital'),
+              onPressed: () {
+                setState(() {
+                  _userRepo.addHospital(_name, _email, _phoneNumber, _address);
+                  Navigator.pop(context);
+                });
+              },
+            ),
+          ],
+        ),
+      );
   }
 }

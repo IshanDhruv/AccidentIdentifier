@@ -21,12 +21,12 @@ class CustomUser {
     name = json['name'];
     phoneNumber = json['number'];
     email = json['email'];
-    if (json['notifyContacts'] != null) {
-      contacts = <Contact>[];
-      json['notifyContacts'].forEach((c) {
-        contacts.add(Contact.fromJson(c));
-      });
-    }
+    // if (json['notifyContacts'] != null) {
+    //   contacts = <Contact>[];
+    //   json['notifyContacts'].forEach((c) {
+    //     contacts.add(Contact.fromJson(c));
+    //   });
+    // }
     hospitals = json['hospitals'];
   }
 }

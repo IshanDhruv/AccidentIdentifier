@@ -14,7 +14,6 @@ class UserRepository {
   Stream<CustomUser> get user async* {
     try {
       await fetchUser();
-      print(_user.name);
       yield _user;
     } catch (e) {
       print(e);
@@ -30,7 +29,6 @@ class UserRepository {
       if (response.statusCode == 200) {
         var body = jsonDecode(response.body);
         _user = CustomUser.fromJson(body);
-
         return _user;
       } else {
         print(response.body);
@@ -65,6 +63,28 @@ class UserRepository {
         return true;
       } else
         print(response.body);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<List<Contact>> getContacts() async {
+    List<Contact> contacts;
+    try {
+      String url = BaseUrl + ContactGroup;
+      var response = await http.get(Uri.parse(url), headers: {
+        HttpHeaders.authorizationHeader: '$token',
+      });
+      if (response.statusCode == 200) {
+        var body = jsonDecode(response.body);
+        if (body != null) contacts = <Contact>[];
+        body.forEach((c) {
+          contacts.add(Contact.fromJson(c));
+        });
+        return contacts;
+      } else {
+        print(response.body);
+      }
     } catch (e) {
       print(e);
     }

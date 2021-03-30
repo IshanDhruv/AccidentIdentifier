@@ -13,19 +13,21 @@ class ContactsScreen extends StatefulWidget {
 
 class _ContactsScreenState extends State<ContactsScreen> {
   int _state = 0;
-  var _user;
+  var _userStream;
+  var _contactsStream;
   UserRepository _userRepo;
 
   @override
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, watch, child) {
-        _user = watch(userProvider);
+        _userStream = watch(userProvider);
+        _contactsStream = watch(contactsProvider);
         _userRepo = watch(userServicesProvider);
-        return _user.when(
-          data: (value) {
-            if (value != null)
-              return _contactsUI(value);
+        return _userStream.when(
+          data: (user) {
+            if (user != null)
+              return _contactsUI(user);
             else
               return Center(
                 child: Text("Something went wrong. :("),
@@ -119,52 +121,66 @@ class _ContactsScreenState extends State<ContactsScreen> {
         ]),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          _showInputDialog();
+        },
         child: Icon(Icons.person_add),
       ),
     );
   }
 
   Widget _friendsUI(CustomUser user) {
-    List<Contact> _contacts = [
-      Contact(
-          name: "Harshul", phoneNumber: "+911234567890", relation: "Brother"),
-      Contact(
-          name: "Harshul", phoneNumber: "+911234567890", relation: "Friend"),
-    ];
-    print("userss");
-    print(user.contacts.length);
-    return Container(
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: _contacts.length,
-        itemBuilder: (context, index) {
-          return Container(
-            decoration: BoxDecoration(
-              border: Border.all(),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: EdgeInsets.all(5),
-            margin: EdgeInsets.all(5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  user.contacts.length.toString(),
-                  style: TextStyle(fontSize: 24),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(_contacts[index].relation),
-                    Text(_contacts[index].phoneNumber),
-                  ],
-                ),
-              ],
-            ),
+    return _contactsStream.when(
+      data: (contacts) {
+        if (contacts != null) {
+          if (contacts.isNotEmpty)
+            return ListView.builder(
+              shrinkWrap: true,
+              itemCount: contacts.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: EdgeInsets.all(5),
+                  margin: EdgeInsets.all(5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        contacts[index].name,
+                        style: TextStyle(fontSize: 24),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(contacts[index].relation ?? 'Friend'),
+                          Text(contacts[index].phoneNumber ?? ''),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          else
+            return Center(
+              child: Text("Please add a contact."),
+            );
+        } else
+          return Center(
+            child: Text("Something went wrong. :("),
           );
-        },
-      ),
+      },
+      loading: () {
+        return Center(child: CircularProgressIndicator());
+      },
+      error: (error, stackTrace) {
+        return Center(
+          child: Text(error.toString()),
+        );
+      },
     );
   }
 
@@ -209,6 +225,59 @@ class _ContactsScreenState extends State<ContactsScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  _showInputDialog() {
+    String _name;
+    String _email;
+    String _phoneNumber;
+
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Add Contact"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration: new InputDecoration(hintText: "Name"),
+              onChanged: (value) {
+                setState(() {
+                  _name = value;
+                });
+              },
+            ),
+            TextField(
+              decoration: new InputDecoration(hintText: "Email"),
+              onChanged: (value) {
+                setState(() {
+                  _email = value;
+                });
+              },
+            ),
+            TextField(
+              decoration: new InputDecoration(hintText: "Phone  Number"),
+              onChanged: (value) {
+                setState(() {
+                  _phoneNumber = value;
+                });
+              },
+            ),
+          ],
+        ),
+        actions: [
+          OutlinedButton(
+            child: Text('Add Contact'),
+            onPressed: () {
+              setState(() {
+                _userRepo.addContact(_name, _email, _phoneNumber);
+                Navigator.pop(context);
+              });
+            },
+          ),
+        ],
       ),
     );
   }

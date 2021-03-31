@@ -143,28 +143,33 @@ class _ContactsScreenState extends State<ContactsScreen> {
               shrinkWrap: true,
               itemCount: contacts.length,
               itemBuilder: (context, index) {
-                return Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: EdgeInsets.all(5),
-                  margin: EdgeInsets.all(5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        contacts[index].name,
-                        style: TextStyle(fontSize: 24),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(contacts[index].relation ?? 'Friend'),
-                          Text(contacts[index].phoneNumber ?? ''),
-                        ],
-                      ),
-                    ],
+                return GestureDetector(
+                  onLongPress: () async {
+                    await _userRepo.deleteContact(contacts[index].id);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: EdgeInsets.all(5),
+                    margin: EdgeInsets.all(5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          contacts[index].name,
+                          style: TextStyle(fontSize: 24),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(contacts[index].relation ?? 'Friend'),
+                            Text(contacts[index].phoneNumber ?? ''),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },

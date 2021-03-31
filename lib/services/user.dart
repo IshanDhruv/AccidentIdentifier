@@ -88,6 +88,25 @@ class UserRepository {
     }
   }
 
+  Future deleteContact(String id) async {
+    try {
+      String url = BaseUrl + ContactGroup + '/' + id;
+      var response = await http.delete(Uri.parse(url), headers: {
+        HttpHeaders.authorizationHeader: '$token',
+      });
+      print(response.body);
+      if (response.statusCode == 200) {
+        var body = jsonDecode(response.body);
+        print(body);
+        return true;
+      } else {
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future addHospital(
       String name, String email, String phoneNumber, String address) async {
     try {

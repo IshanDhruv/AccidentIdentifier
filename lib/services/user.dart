@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:accident_identifier/data/repositories/contact_repo.dart';
+import 'package:accident_identifier/data/repositories/hospital_repo.dart';
+import 'package:accident_identifier/data/repositories/user_repo.dart';
 import 'package:accident_identifier/models/contact.dart';
 import 'package:accident_identifier/models/hospital.dart';
 import 'package:accident_identifier/models/user.dart';
-import 'package:accident_identifier/repositories/contact_repo.dart';
-import 'package:accident_identifier/repositories/hospital_repo.dart';
-import 'package:accident_identifier/repositories/user_repo.dart';
 import 'package:accident_identifier/services/api_response.dart';
 import 'package:get/get.dart';
 

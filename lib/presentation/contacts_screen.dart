@@ -164,6 +164,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 });
             break;
         }
+        return Container();
       }),
     );
   }
@@ -225,6 +226,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             );
             break;
         }
+        return Container();
       }),
     );
   }

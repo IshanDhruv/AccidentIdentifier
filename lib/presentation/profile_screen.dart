@@ -14,7 +14,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
-    print("yes");
     _controller.getUserDetails();
     super.initState();
   }
@@ -44,6 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return _userProfile(_controller.user.value);
           break;
       }
+      return Container();
     }));
   }
 

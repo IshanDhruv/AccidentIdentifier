@@ -52,75 +52,77 @@ class _ContactsScreenState extends State<ContactsScreen> {
     return Scaffold(
       body: Container(
         margin: EdgeInsets.all(15),
-        child: Column(children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _state = 0;
-                  });
-                },
-                child: Container(
-                  width: 150,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    color: _state == 0 ? Colors.black : Colors.white,
-                    border: Border.all(),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(5),
-                      bottomLeft: Radius.circular(5),
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "Friends and Family",
-                      style: TextStyle(
-                        color: _state == 0 ? Colors.white : Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _state = 1;
-                  });
-                },
-                child: Container(
-                  width: 150,
-                  height: 30,
-                  decoration: BoxDecoration(
-                      color: _state == 1 ? Colors.black : Colors.white,
+        child: SingleChildScrollView(
+          child: Column(children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _state = 0;
+                    });
+                  },
+                  child: Container(
+                    width: 150,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: _state == 0 ? Colors.black : Colors.white,
                       border: Border.all(),
                       borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(5),
-                        bottomRight: Radius.circular(5),
-                      )),
-                  child: Center(
-                    child: Text(
-                      "Hospitals",
-                      style: TextStyle(
-                        color: _state == 1 ? Colors.white : Colors.black,
+                        topLeft: Radius.circular(5),
+                        bottomLeft: Radius.circular(5),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "Friends and Family",
+                        style: TextStyle(
+                          color: _state == 0 ? Colors.white : Colors.black,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 30),
-          Builder(
-            builder: (context) {
-              if (_state == 0)
-                return _friendsUI(user);
-              else
-                return _hospitalsUI(user);
-            },
-          )
-        ]),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _state = 1;
+                    });
+                  },
+                  child: Container(
+                    width: 150,
+                    height: 30,
+                    decoration: BoxDecoration(
+                        color: _state == 1 ? Colors.black : Colors.white,
+                        border: Border.all(),
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(5),
+                          bottomRight: Radius.circular(5),
+                        )),
+                    child: Center(
+                      child: Text(
+                        "Hospitals",
+                        style: TextStyle(
+                          color: _state == 1 ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 30),
+            Builder(
+              builder: (context) {
+                if (_state == 0)
+                  return _friendsUI(user);
+                else
+                  return _hospitalsUI(user);
+              },
+            )
+          ]),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -137,6 +139,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         if (contacts != null) {
           if (contacts.isNotEmpty)
             return ListView.builder(
+              physics: ClampingScrollPhysics(),
               shrinkWrap: true,
               itemCount: contacts.length,
               itemBuilder: (context, index) {
@@ -266,7 +269,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 },
               ),
               TextField(
-                decoration: new InputDecoration(hintText: "Location"),
+                decoration: new InputDecoration(hintText: "Email"),
                 onChanged: (value) {
                   setState(() {
                     _email = value;

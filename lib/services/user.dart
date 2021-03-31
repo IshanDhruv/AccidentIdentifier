@@ -4,158 +4,55 @@ import 'dart:io';
 import 'package:accident_identifier/models/contact.dart';
 import 'package:accident_identifier/models/hospital.dart';
 import 'package:accident_identifier/models/user.dart';
-import 'package:accident_identifier/services/api_routes.dart';
-import 'package:accident_identifier/services/shared_prefs.dart';
-import 'package:http/http.dart' as http;
+import 'package:accident_identifier/repositories/contact_repo.dart';
+import 'package:accident_identifier/repositories/hospital_repo.dart';
+import 'package:accident_identifier/repositories/user_repo.dart';
+import 'package:accident_identifier/services/api_response.dart';
+import 'package:get/get.dart';
 
-class UserRepository {
-  CustomUser _user;
-  String token = sharedPreferences.getString('userToken');
+class UserController extends GetxController {
+  final _contactRepo = ContactRepository();
+  var contactDetailsObs = ApiResponse<List<Contact>>.loading().obs;
+  ApiResponse<List<Contact>> get contactDetails => contactDetailsObs.value;
+  var contacts = <Contact>[].obs;
 
-  Stream<CustomUser> get user async* {
-    try {
-      await fetchUser();
-      yield _user;
-    } catch (e) {
-      print(e);
+  final _hospitalRepo = HospitalRepository();
+  var hospitalDetailsObs = ApiResponse<List<Hospital>>.loading().obs;
+  ApiResponse<List<Hospital>> get hospitalDetails => hospitalDetailsObs.value;
+  var hospitals = <Hospital>[].obs;
+
+  final _userRepo = UserRepository();
+  var userDetailsObs = ApiResponse<CustomUser>.loading().obs;
+  ApiResponse<CustomUser> get userDetails => userDetailsObs.value;
+  var user = CustomUser().obs;
+
+  Future getUserDetails() async {
+    final response = await _userRepo.getUserDetails();
+    if (response.status == Status.COMPLETED) {
+      user.value = response.data;
+      update();
     }
+    userDetailsObs.value = response;
+    update();
   }
 
-  Future fetchUser() async {
-    try {
-      String url = BaseUrl + UserGroup + UserProfileRoute;
-      var response = await http.get(Uri.parse(url), headers: {
-        HttpHeaders.authorizationHeader: '$token',
-      });
-      if (response.statusCode == 200) {
-        var body = jsonDecode(response.body);
-        _user = CustomUser.fromJson(body);
-        return _user;
-      } else {
-        print(response.body);
-      }
-    } catch (e) {
-      print(e);
+  Future getContacts() async {
+    final response = await _contactRepo.getContacts();
+    if (response.status == Status.COMPLETED) {
+      contacts.value = response.data;
+      update();
     }
+    contactDetailsObs.value = response;
+    update();
   }
 
-  Future addContact(String name, String email, String phoneNumber) async {
-    try {
-      String url = BaseUrl + ContactGroup + AddContactRoute;
-      var response = await http.post(Uri.parse(url),
-          headers: {
-            HttpHeaders.contentTypeHeader: "application/json",
-            HttpHeaders.authorizationHeader: '$token',
-          },
-          body: jsonEncode({
-            'name': name,
-            'phoneNumber': phoneNumber,
-            'email': email,
-          }));
-      print(response.statusCode);
-
-      if (response.statusCode == 200) {
-        var body = jsonDecode(response.body);
-        _user = CustomUser.fromJson(body);
-
-        return true;
-      } else
-        print(response.body);
-    } catch (e) {
-      print(e);
+  Future getHospitals() async {
+    final response = await _hospitalRepo.getHospitals();
+    if (response.status == Status.COMPLETED) {
+      hospitals.value = response.data;
+      update();
     }
-  }
-
-  Future<List<Contact>> getContacts() async {
-    List<Contact> contacts;
-    try {
-      String url = BaseUrl + ContactGroup;
-      var response = await http.get(Uri.parse(url), headers: {
-        HttpHeaders.authorizationHeader: '$token',
-      });
-      if (response.statusCode == 200) {
-        var body = jsonDecode(response.body);
-        if (body != null) contacts = <Contact>[];
-        body.forEach((c) {
-          contacts.add(Contact.fromJson(c));
-        });
-        return contacts;
-      } else {
-        print(response.body);
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future deleteContact(String id) async {
-    try {
-      String url = BaseUrl + ContactGroup + '/' + id;
-      var response = await http.delete(Uri.parse(url), headers: {
-        HttpHeaders.authorizationHeader: '$token',
-      });
-      print(response.body);
-      if (response.statusCode == 200) {
-        var body = jsonDecode(response.body);
-        print(body);
-        return true;
-      } else {
-        print(response.body);
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future addHospital(
-      String name, String email, String phoneNumber, String address) async {
-    try {
-      String url = BaseUrl + HospitalGroup + AddHospitalRoute;
-      var response = await http.post(Uri.parse(url),
-          headers: {
-            HttpHeaders.contentTypeHeader: "application/json",
-            HttpHeaders.authorizationHeader: '$token',
-          },
-          body: jsonEncode({
-            'name': name,
-            'phoneNumber': phoneNumber,
-            'email': email,
-            'address': address
-          }));
-      print(response.statusCode);
-
-      if (response.statusCode == 200) {
-        var body = jsonDecode(response.body);
-        _user = CustomUser.fromJson(body);
-
-        return true;
-      } else
-        print(response.body);
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future<List<Hospital>> getHospitals() async {
-    List<Hospital> hospitals;
-    try {
-      String url = BaseUrl + HospitalGroup;
-      var response = await http.get(Uri.parse(url), headers: {
-        HttpHeaders.authorizationHeader: '$token',
-      });
-      print(response.body);
-      if (response.statusCode == 200) {
-        var body = jsonDecode(response.body);
-        if (body != null) hospitals = <Hospital>[];
-        body.forEach((c) {
-          hospitals.add(Hospital.fromJson(c));
-        });
-        return hospitals;
-      } else {
-        print(response.body);
-      }
-    } catch (e) {
-      print(e);
-    }
+    hospitalDetailsObs.value = response;
+    update();
   }
 }

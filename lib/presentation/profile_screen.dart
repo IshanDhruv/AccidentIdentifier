@@ -1,7 +1,8 @@
 import 'package:accident_identifier/models/user.dart';
-import 'package:accident_identifier/providers/user_provider.dart';
+import 'package:accident_identifier/services/api_response.dart';
+import 'package:accident_identifier/services/user.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -9,29 +10,41 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final UserController _controller = Get.find<UserController>();
+
+  @override
+  void initState() {
+    print("yes");
+    _controller.getUserDetails();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer(builder: (context, watch, child) {
-      final _userState = watch(userProvider);
-      return _userState.when(
-        data: (value) {
-          if (value != null)
-            return _userProfile(value);
-          else
-            return Center(
-              child: Text("Something went wrong. :("),
-            );
-        },
-        loading: () {
+    return Container(child: Obx(() {
+      switch (_controller.userDetails.status) {
+        case Status.INIT:
+          break;
+        case Status.LOADING:
           return Center(child: CircularProgressIndicator());
-        },
-        error: (error, stackTrace) {
+          break;
+        case Status.ERROR:
+          debugPrint(_controller.userDetails.message);
           return Center(
-            child: Text(error.toString()),
+            child: Container(
+              margin: EdgeInsets.all(32),
+              child: Text(
+                _controller.userDetails.message,
+                textAlign: TextAlign.center,
+              ),
+            ),
           );
-        },
-      );
-    });
+          break;
+        case Status.COMPLETED:
+          return _userProfile(_controller.user.value);
+          break;
+      }
+    }));
   }
 
   Widget _userProfile(CustomUser user) {

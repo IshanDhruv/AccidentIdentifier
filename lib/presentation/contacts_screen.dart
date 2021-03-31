@@ -1,10 +1,7 @@
-import 'package:accident_identifier/models/contact.dart';
-import 'package:accident_identifier/models/hospital.dart';
-import 'package:accident_identifier/models/user.dart';
-import 'package:accident_identifier/providers/user_provider.dart';
+import 'package:accident_identifier/services/api_response.dart';
 import 'package:accident_identifier/services/user.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 
 class ContactsScreen extends StatefulWidget {
   @override
@@ -12,43 +9,22 @@ class ContactsScreen extends StatefulWidget {
 }
 
 class _ContactsScreenState extends State<ContactsScreen> {
+  final UserController _controller = Get.find<UserController>();
   int _state = 0;
-  var _userStream;
-  var _contactsStream;
-  var _hospitalsStream;
-  UserRepository _userRepo;
+
+  @override
+  void initState() {
+    _controller.getContacts();
+    _controller.getHospitals();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, watch, child) {
-        _userStream = watch(userProvider);
-        _contactsStream = watch(contactsProvider);
-        _hospitalsStream = watch(hospitalsProvider);
-        _userRepo = watch(userServicesProvider);
-        return _userStream.when(
-          data: (user) {
-            if (user != null)
-              return _contactsUI(user);
-            else
-              return Center(
-                child: Text("Something went wrong. :("),
-              );
-          },
-          loading: () {
-            return Center(child: CircularProgressIndicator());
-          },
-          error: (error, stackTrace) {
-            return Center(
-              child: Text(error.toString()),
-            );
-          },
-        );
-      },
-    );
+    return _contactsUI();
   }
 
-  Widget _contactsUI(CustomUser user) {
+  Widget _contactsUI() {
     return Scaffold(
       body: Container(
         margin: EdgeInsets.all(15),
@@ -116,9 +92,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
             Builder(
               builder: (context) {
                 if (_state == 0)
-                  return _friendsUI(user);
+                  return _friendsUI();
                 else
-                  return _hospitalsUI(user);
+                  return _hospitalsUI();
               },
             )
           ]),
@@ -133,21 +109,35 @@ class _ContactsScreenState extends State<ContactsScreen> {
     );
   }
 
-  Widget _friendsUI(CustomUser user) {
-    return _contactsStream.when(
-      data: (contacts) {
-        if (contacts != null) {
-          if (contacts.isNotEmpty)
+  Widget _friendsUI() {
+    return Container(
+      child: Obx(() {
+        switch (_controller.contactDetails.status) {
+          case Status.INIT:
+            break;
+          case Status.LOADING:
+            return Center(child: CircularProgressIndicator());
+            break;
+          case Status.ERROR:
+            debugPrint(_controller.contactDetails.message);
+            return Center(
+              child: Container(
+                margin: EdgeInsets.all(32),
+                child: Text(
+                  _controller.contactDetails.message,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+            break;
+          case Status.COMPLETED:
+            var contacts = _controller.contacts.value;
             return ListView.builder(
-              physics: ClampingScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: contacts.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onLongPress: () async {
-                    await _userRepo.deleteContact(contacts[index].id);
-                  },
-                  child: Container(
+                physics: ClampingScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: contacts.length,
+                itemBuilder: (context, index) {
+                  return Container(
                     decoration: BoxDecoration(
                       border: Border.all(),
                       borderRadius: BorderRadius.circular(12),
@@ -170,35 +160,37 @@ class _ContactsScreenState extends State<ContactsScreen> {
                         ),
                       ],
                     ),
-                  ),
-                );
-              },
-            );
-          else
-            return Center(
-              child: Text("Please add a contact."),
-            );
-        } else
-          return Center(
-            child: Text("Something went wrong. :("),
-          );
-      },
-      loading: () {
-        return Center(child: CircularProgressIndicator());
-      },
-      error: (error, stackTrace) {
-        return Center(
-          child: Text(error.toString()),
-        );
-      },
+                  );
+                });
+            break;
+        }
+      }),
     );
   }
 
-  Widget _hospitalsUI(CustomUser user) {
-    return _hospitalsStream.when(
-      data: (hospitals) {
-        if (hospitals != null) {
-          if (hospitals.isNotEmpty)
+  Widget _hospitalsUI() {
+    return Container(
+      child: Obx(() {
+        switch (_controller.hospitalDetails.status) {
+          case Status.INIT:
+            break;
+          case Status.LOADING:
+            return Center(child: CircularProgressIndicator());
+            break;
+          case Status.ERROR:
+            debugPrint(_controller.hospitalDetails.message);
+            return Center(
+              child: Container(
+                margin: EdgeInsets.all(32),
+                child: Text(
+                  _controller.hospitalDetails.message,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+            break;
+          case Status.COMPLETED:
+            var hospitals = _controller.hospitals.value;
             return Container(
               child: ListView.builder(
                 shrinkWrap: true,
@@ -231,23 +223,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 },
               ),
             );
-          else
-            return Center(
-              child: Text("Please add a hospital."),
-            );
-        } else
-          return Center(
-            child: Text("Something went wrong. :("),
-          );
-      },
-      loading: () {
-        return Center(child: CircularProgressIndicator());
-      },
-      error: (error, stackTrace) {
-        return Center(
-          child: Text(error.toString()),
-        );
-      },
+            break;
+        }
+      }),
     );
   }
 
@@ -294,12 +272,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           actions: [
             OutlinedButton(
               child: Text('Add Contact'),
-              onPressed: () {
-                setState(() {
-                  _userRepo.addContact(_name, _email, _phoneNumber);
-                  Navigator.pop(context);
-                });
-              },
+              onPressed: () {},
             ),
           ],
         ),
@@ -349,12 +322,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           actions: [
             OutlinedButton(
               child: Text('Add Hospital'),
-              onPressed: () {
-                setState(() {
-                  _userRepo.addHospital(_name, _email, _phoneNumber, _address);
-                  Navigator.pop(context);
-                });
-              },
+              onPressed: () {},
             ),
           ],
         ),

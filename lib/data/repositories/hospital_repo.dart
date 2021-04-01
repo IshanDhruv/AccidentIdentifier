@@ -57,4 +57,22 @@ class HospitalRepository {
       print(e);
     }
   }
+
+  Future<ApiResponse<bool>> deleteHospital(String id) async {
+    String token = sharedPreferences.getString('userToken');
+    try {
+      String query = Uri(queryParameters: {'id': id}).query;
+      String url = BaseUrl + HospitalGroup + '?' + query;
+      var response = await http.delete(Uri.parse(url), headers: {
+        HttpHeaders.authorizationHeader: '$token',
+      });
+      if (response.statusCode == 200) {
+        return ApiResponse.completed(true);
+      } else {
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 }

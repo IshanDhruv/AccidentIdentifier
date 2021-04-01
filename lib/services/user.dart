@@ -75,4 +75,11 @@ class UserController extends GetxController {
       return true;
     }
   }
+
+  Future deleteHospital(String id) async {
+    final response = await _hospitalRepo.deleteHospital(id);
+    if (response.status == Status.COMPLETED) {
+      return true;
+    }
+  }
 }

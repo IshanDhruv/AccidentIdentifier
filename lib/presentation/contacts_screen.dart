@@ -393,14 +393,21 @@ class _ContactsScreenState extends State<ContactsScreen> {
           actions: [
             OutlinedButton(
               child: Text('Cancel'),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
             OutlinedButton(
               child: Text(
                 'Delete',
                 style: TextStyle(color: Colors.red),
               ),
-              onPressed: () {},
+              onPressed: () {
+                _controller.deleteHospital(id).then((value) async {
+                  if (value == true) await _controller.getHospitals();
+                  Navigator.pop(context);
+                });
+              },
             ),
           ],
         ),

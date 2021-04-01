@@ -104,7 +104,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         onPressed: () {
           _showInputDialog(_state);
         },
-        child: Icon(Icons.person_add),
+        child: Icon(Icons.add),
       ),
     );
   }

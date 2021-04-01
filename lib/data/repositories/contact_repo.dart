@@ -60,7 +60,8 @@ class ContactRepository {
   Future<ApiResponse<bool>> deleteContact(String id) async {
     String token = sharedPreferences.getString('userToken');
     try {
-      String url = BaseUrl + ContactGroup + '/' + id;
+      String query = Uri(queryParameters: {'id': id}).query;
+      String url = BaseUrl + ContactGroup + '?' + query;
       var response = await http.delete(Uri.parse(url), headers: {
         HttpHeaders.authorizationHeader: '$token',
       });

@@ -274,7 +274,13 @@ class _ContactsScreenState extends State<ContactsScreen> {
           actions: [
             OutlinedButton(
               child: Text('Add Contact'),
-              onPressed: () {},
+              onPressed: () {
+                _controller
+                    .addContact(_name, _email, _phoneNumber)
+                    .then((value) {
+                  if (value == true) _controller.getContacts();
+                });
+              },
             ),
           ],
         ),

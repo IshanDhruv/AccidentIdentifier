@@ -52,4 +52,11 @@ class UserController extends GetxController {
     hospitalDetailsObs.value = response;
     update();
   }
+
+  Future addContact(String name, String email, String phoneNumber) async {
+    final response = await _contactRepo.addContact(name, email, phoneNumber);
+    if (response.status == Status.COMPLETED) {
+      return true;
+    }
+  }
 }

@@ -279,6 +279,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                     .addContact(_name, _email, _phoneNumber)
                     .then((value) {
                   if (value == true) _controller.getContacts();
+                  Navigator.pop(context);
                 });
               },
             ),
@@ -330,7 +331,14 @@ class _ContactsScreenState extends State<ContactsScreen> {
           actions: [
             OutlinedButton(
               child: Text('Add Hospital'),
-              onPressed: () {},
+              onPressed: () {
+                _controller
+                    .addHospital(_name, _email, _phoneNumber, _address)
+                    .then((value) {
+                  if (value == true) _controller.getHospitals();
+                  Navigator.pop(context);
+                });
+              },
             ),
           ],
         ),

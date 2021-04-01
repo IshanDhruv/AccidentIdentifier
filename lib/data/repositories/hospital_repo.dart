@@ -30,4 +30,31 @@ class HospitalRepository {
       print(e);
     }
   }
+
+  Future<ApiResponse<bool>> addHospital(
+      String name, String email, String phoneNumber, String address) async {
+    try {
+      String token = sharedPreferences.getString('userToken');
+      String url = BaseUrl + HospitalGroup + AddContactRoute;
+      var response = await http.post(Uri.parse(url),
+          headers: {
+            HttpHeaders.contentTypeHeader: "application/json",
+            HttpHeaders.authorizationHeader: '$token',
+          },
+          body: jsonEncode({
+            'name': name,
+            'phoneNumber': phoneNumber,
+            'email': email,
+            'address': address
+          }));
+      print(response.statusCode);
+
+      if (response.statusCode == 200) {
+        return ApiResponse.completed(true);
+      } else
+        print(response.body);
+    } catch (e) {
+      print(e);
+    }
+  }
 }

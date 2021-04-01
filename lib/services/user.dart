@@ -59,4 +59,13 @@ class UserController extends GetxController {
       return true;
     }
   }
+
+  Future addHospital(
+      String name, String email, String phoneNumber, String address) async {
+    final response =
+        await _hospitalRepo.addHospital(name, email, phoneNumber, address);
+    if (response.status == Status.COMPLETED) {
+      return true;
+    }
+  }
 }

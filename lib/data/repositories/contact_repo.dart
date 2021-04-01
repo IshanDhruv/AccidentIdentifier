@@ -57,19 +57,20 @@ class ContactRepository {
     }
   }
 
-  // Future deleteContact(String id) async {
-  //   try {
-  //     String url = BaseUrl + ContactGroup + '/' + id;
-  //     var response = await http.delete(Uri.parse(url), headers: {
-  //       HttpHeaders.authorizationHeader: '$token',
-  //     });
-  //     if (response.statusCode == 200) {
-  //       return true;
-  //     } else {
-  //       print(response.body);
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
+  Future<ApiResponse<bool>> deleteContact(String id) async {
+    String token = sharedPreferences.getString('userToken');
+    try {
+      String url = BaseUrl + ContactGroup + '/' + id;
+      var response = await http.delete(Uri.parse(url), headers: {
+        HttpHeaders.authorizationHeader: '$token',
+      });
+      if (response.statusCode == 200) {
+        return ApiResponse.completed(true);
+      } else {
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 }

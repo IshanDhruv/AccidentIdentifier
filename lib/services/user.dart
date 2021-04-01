@@ -68,4 +68,11 @@ class UserController extends GetxController {
       return true;
     }
   }
+
+  Future deleteContact(String id) async {
+    final response = await _contactRepo.deleteContact(id);
+    if (response.status == Status.COMPLETED) {
+      return true;
+    }
+  }
 }

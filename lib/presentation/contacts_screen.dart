@@ -137,28 +137,33 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 shrinkWrap: true,
                 itemCount: contacts.length,
                 itemBuilder: (context, index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: EdgeInsets.all(5),
-                    margin: EdgeInsets.all(5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          contacts[index].name,
-                          style: TextStyle(fontSize: 24),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(contacts[index].relation ?? 'Friend'),
-                            Text(contacts[index].phoneNumber ?? ''),
-                          ],
-                        ),
-                      ],
+                  return GestureDetector(
+                    onLongPress: () {
+                      _showDeleteDialog(_state, contacts[index].id);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.all(5),
+                      margin: EdgeInsets.all(5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            contacts[index].name,
+                            style: TextStyle(fontSize: 24),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(contacts[index].relation ?? 'Friend'),
+                              Text(contacts[index].phoneNumber ?? ''),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 });
@@ -197,28 +202,33 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 shrinkWrap: true,
                 itemCount: hospitals.length,
                 itemBuilder: (context, index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: EdgeInsets.all(5),
-                    margin: EdgeInsets.all(5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          hospitals[index].name,
-                          style: TextStyle(fontSize: 24),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(hospitals[index].location ?? ''),
-                            Text(hospitals[index].phoneNumber ?? ''),
-                          ],
-                        ),
-                      ],
+                  return GestureDetector(
+                    onLongPress: () {
+                      _showDeleteDialog(_state, hospitals[index].id);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.all(5),
+                      margin: EdgeInsets.all(5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            hospitals[index].name,
+                            style: TextStyle(fontSize: 24),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(hospitals[index].location ?? ''),
+                              Text(hospitals[index].phoneNumber ?? ''),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -339,6 +349,58 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   Navigator.pop(context);
                 });
               },
+            ),
+          ],
+        ),
+      );
+  }
+
+  _showDeleteDialog(int state, String id) {
+    if (state == 0)
+      return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Delete Contact"),
+          content: Text("Are you sure you want to delete this contact?"),
+          actions: [
+            OutlinedButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            OutlinedButton(
+              child: Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () {
+                _controller.deleteContact(id).then((value) async {
+                  if (value == true) await _controller.getContacts();
+                  Navigator.pop(context);
+                });
+              },
+            ),
+          ],
+        ),
+      );
+    else
+      return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Delete Hospital"),
+          content: Text("Are you sure you want to delete this hospital?"),
+          actions: [
+            OutlinedButton(
+              child: Text('Cancel'),
+              onPressed: () {},
+            ),
+            OutlinedButton(
+              child: Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () {},
             ),
           ],
         ),

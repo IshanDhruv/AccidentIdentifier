@@ -1,4 +1,4 @@
-import 'package:accident_identifier/models/contact.dart';
+import 'package:accident_identifier/data/models/contact.dart';
 
 class CustomUser {
   String id;

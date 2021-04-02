@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:accident_identifier/models/contact.dart';
+import 'package:accident_identifier/data/models/contact.dart';
 import 'package:accident_identifier/services/api_response.dart';
 import 'package:accident_identifier/services/api_routes.dart';
 import 'package:accident_identifier/services/shared_prefs.dart';

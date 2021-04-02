@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:accident_identifier/models/position_item.dart';
+import 'package:accident_identifier/data/models/position_item.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 

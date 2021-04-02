@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:accident_identifier/models/position_item.dart';
+import 'package:accident_identifier/services/location.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -13,15 +16,20 @@ class _HomeScreenState extends State<HomeScreen> {
   LocationPermission locationPermission;
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
-  final List<_PositionItem> _positionItems = <_PositionItem>[];
-  StreamSubscription<Position> _positionStreamSubscription;
+  LocationController _controller = Get.find<LocationController>();
+
+  @override
+  void initState() {
+    _controller.getLocation();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldMessengerKey,
-      body: FutureBuilder<LocationPermission>(
-        future: Geolocator.requestPermission(),
+      body: FutureBuilder(
+        future: _controller.getLocation(),
         builder: (context, snapshot) {
           locationPermission = snapshot.data;
           if (locationPermission == LocationPermission.deniedForever) {
@@ -38,27 +46,30 @@ class _HomeScreenState extends State<HomeScreen> {
             });
             return Container();
           }
-          if (_positionItems.isNotEmpty) {
-            final positionItem = _positionItems.last;
-            if (positionItem.type == _PositionItemType.permission) {
-              return ListTile(
-                title: Text(positionItem.displayValue,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    )),
-              );
-            } else {
-              return Card(
-                child: ListTile(
-                  title: Text(
-                    positionItem.displayValue,
+
+          return Obx(() {
+            if (_controller.positionItems.isNotEmpty) {
+              final positionItem = _controller.positionItems.last;
+              if (positionItem.type == PositionItemType.permission) {
+                return ListTile(
+                  title: Text(positionItem.displayValue,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      )),
+                );
+              } else {
+                return Card(
+                  child: ListTile(
+                    title: Text(
+                      positionItem.displayValue,
+                    ),
                   ),
-                ),
-              );
-            }
-          } else
-            return Container();
+                );
+              }
+            } else
+              return Container();
+          });
         },
       ),
       floatingActionButton: Stack(
@@ -70,9 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () async {
                   await Geolocator.getCurrentPosition().then(
                     (value) => {
-                      _positionItems.add(
-                        _PositionItem(
-                          _PositionItemType.position,
+                      _controller.positionItems.add(
+                        PositionItem(
+                          PositionItemType.position,
                           value.toString(),
                         ),
                       )
@@ -81,78 +92,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 label: Text("Current Position")),
           ),
-          Positioned(
-            bottom: 80.0,
-            right: 10.0,
-            child: FloatingActionButton.extended(
-              onPressed: _toggleListening,
-              label: Text(() {
-                if (_positionStreamSubscription == null) {
-                  return "Start stream";
-                } else {
-                  final buttonText =
-                      _positionStreamSubscription.isPaused ? "Resume" : "Pause";
-                  return "$buttonText stream";
-                }
-              }()),
-              backgroundColor: _determineButtonColor(),
-            ),
-          ),
         ],
       ),
     );
   }
 
-  bool _isListening() => !(_positionStreamSubscription == null ||
-      _positionStreamSubscription.isPaused);
-
-  Color _determineButtonColor() {
-    return _isListening() ? Colors.green : Colors.red;
-  }
-
-  void _toggleListening() {
-    if (_positionStreamSubscription == null) {
-      final positionStream = Geolocator.getPositionStream();
-      _positionStreamSubscription = positionStream.handleError((error) {
-        _positionStreamSubscription?.cancel();
-        _positionStreamSubscription = null;
-      }).listen((position) => setState(() => _positionItems.add(
-          _PositionItem(_PositionItemType.position, position.toString()))));
-      _positionStreamSubscription?.pause();
-    }
-
-    setState(() {
-      if (_positionStreamSubscription == null) {
-        return;
-      }
-
-      if (_positionStreamSubscription.isPaused) {
-        _positionStreamSubscription.resume();
-      } else {
-        _positionStreamSubscription.pause();
-      }
-    });
-  }
-
   @override
   void dispose() {
-    if (_positionStreamSubscription != null) {
-      _positionStreamSubscription.cancel();
-      _positionStreamSubscription = null;
-    }
-
+    _controller.stopGettingLocation();
     super.dispose();
   }
-}
-
-enum _PositionItemType {
-  permission,
-  position,
-}
-
-class _PositionItem {
-  _PositionItem(this.type, this.displayValue);
-
-  final _PositionItemType type;
-  final String displayValue;
 }

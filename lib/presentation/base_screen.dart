@@ -35,18 +35,22 @@ class _BaseScreenState extends State<BaseScreen> {
           Consumer(
             builder: (context, watch, child) {
               final _auth = watch(authServicesProvider);
-
               return IconButton(
-                  icon: Icon(Icons.exit_to_app),
-                  onPressed: () {
-                    _auth.signOut().then((value) {
+                icon: Icon(Icons.exit_to_app),
+                onPressed: () {
+                  _auth.signOut().then(
+                    (value) {
                       if (value == true)
                         Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Authenticate()));
-                    });
-                  });
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Authenticate(),
+                          ),
+                        );
+                    },
+                  );
+                },
+              );
             },
           )
         ],

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -9,21 +10,34 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    Geolocator.checkPermission().then((value) => print(value));
-    Geolocator.requestPermission().then((value) => print(value));
-    super.initState();
-  }
-
+  LocationPermission locationPermission;
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
   final List<_PositionItem> _positionItems = <_PositionItem>[];
   StreamSubscription<Position> _positionStreamSubscription;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Builder(
-        builder: (context) {
+      key: scaffoldMessengerKey,
+      body: FutureBuilder<LocationPermission>(
+        future: Geolocator.requestPermission(),
+        builder: (context, snapshot) {
+          locationPermission = snapshot.data;
+          if (locationPermission == LocationPermission.deniedForever) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: const Text(
+                    'You have permanently denied location settings. Please got to your apps settings and enable it for the app to work.'),
+                duration: const Duration(seconds: 5),
+                action: SnackBarAction(
+                  label: 'ENABLE',
+                  onPressed: () => AppSettings.openAppSettings(),
+                ),
+              ));
+            });
+            return Container();
+          }
           if (_positionItems.isNotEmpty) {
             final positionItem = _positionItems.last;
             if (positionItem.type == _PositionItemType.permission) {
@@ -54,13 +68,15 @@ class _HomeScreenState extends State<HomeScreen> {
             right: 10.0,
             child: FloatingActionButton.extended(
                 onPressed: () async {
-                  await Geolocator.getCurrentPosition().then((value) => {
-                        _positionItems.add(_PositionItem(
-                            _PositionItemType.position, value.toString()))
-                      });
-
-                  setState(
-                    () {},
+                  await Geolocator.getCurrentPosition().then(
+                    (value) => {
+                      _positionItems.add(
+                        _PositionItem(
+                          _PositionItemType.position,
+                          value.toString(),
+                        ),
+                      )
+                    },
                   );
                 },
                 label: Text("Current Position")),
@@ -76,7 +92,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 } else {
                   final buttonText =
                       _positionStreamSubscription.isPaused ? "Resume" : "Pause";
-
                   return "$buttonText stream";
                 }
               }()),

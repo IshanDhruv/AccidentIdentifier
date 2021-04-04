@@ -15,10 +15,7 @@ class LocationController extends GetxController {
       stream = Geolocator.getPositionStream();
       stream.listen(
         (position) => positionItems.add(
-          PositionItem(
-            PositionItemType.position,
-            position.toString(),
-          ),
+          PositionItem(position),
         ),
       );
     } catch (e) {

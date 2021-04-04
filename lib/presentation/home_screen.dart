@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:accident_identifier/data/models/position_item.dart';
 import 'package:accident_identifier/services/location.dart';
 import 'package:app_settings/app_settings.dart';
@@ -50,23 +48,14 @@ class _HomeScreenState extends State<HomeScreen> {
           return Obx(() {
             if (_controller.positionItems.isNotEmpty) {
               final positionItem = _controller.positionItems.last;
-              if (positionItem.type == PositionItemType.permission) {
-                return ListTile(
-                  title: Text(positionItem.displayValue,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      )),
-                );
-              } else {
-                return Card(
-                  child: ListTile(
-                    title: Text(
-                      positionItem.displayValue,
-                    ),
+
+              return Card(
+                child: ListTile(
+                  title: Text(
+                    positionItem.position.toString(),
                   ),
-                );
-              }
+                ),
+              );
             } else
               return Container();
           });
@@ -83,8 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     (value) => {
                       _controller.positionItems.add(
                         PositionItem(
-                          PositionItemType.position,
-                          value.toString(),
+                          value,
                         ),
                       )
                     },

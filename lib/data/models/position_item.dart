@@ -1,11 +1,7 @@
-enum PositionItemType {
-  permission,
-  position,
-}
+import 'package:geolocator/geolocator.dart';
 
 class PositionItem {
-  PositionItem(this.type, this.displayValue);
+  PositionItem(this.position);
 
-  final PositionItemType type;
-  final String displayValue;
+  final Position position;
 }

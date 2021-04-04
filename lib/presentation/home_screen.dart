@@ -1,8 +1,6 @@
-import 'package:accident_identifier/data/models/position_item.dart';
-import 'package:accident_identifier/services/location.dart';
 import 'package:app_settings/app_settings.dart';
+import 'package:background_location/background_location.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,83 +9,104 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  LocationPermission locationPermission;
-  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
-      GlobalKey<ScaffoldMessengerState>();
-  LocationController _controller = Get.find<LocationController>();
+  String latitude = "waiting...";
+  String longitude = "waiting...";
+  String altitude = "waiting...";
+  String accuracy = "waiting...";
+  String bearing = "waiting...";
+  String speed = "waiting...";
+  String time = "waiting...";
 
   @override
   void initState() {
-    _controller.getLocation();
+    BackgroundLocation.getPermissions(
+      onGranted: () {},
+      onDenied: () {},
+    );
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldMessengerKey,
-      body: FutureBuilder(
-        future: _controller.getLocation(),
-        builder: (context, snapshot) {
-          locationPermission = snapshot.data;
-          if (locationPermission == LocationPermission.deniedForever) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: const Text(
-                    'You have permanently denied location settings. Please got to your apps settings and enable it for the app to work.'),
-                duration: const Duration(seconds: 5),
-                action: SnackBarAction(
-                  label: 'ENABLE',
-                  onPressed: () => AppSettings.openAppSettings(),
-                ),
-              ));
-            });
-            return Container();
-          }
-
-          return Obx(() {
-            if (_controller.positionItems.isNotEmpty) {
-              final positionItem = _controller.positionItems.last;
-
-              return Card(
-                child: ListTile(
-                  title: Text(
-                    positionItem.position.toString(),
-                  ),
-                ),
-              );
-            } else
-              return Container();
-          });
-        },
-      ),
-      floatingActionButton: Stack(
+    return Center(
+      child: ListView(
         children: <Widget>[
-          Positioned(
-            bottom: 10.0,
-            right: 10.0,
-            child: FloatingActionButton.extended(
-                onPressed: () async {
-                  await Geolocator.getCurrentPosition().then(
-                    (value) => {
-                      _controller.positionItems.add(
-                        PositionItem(
-                          value,
-                        ),
-                      )
-                    },
-                  );
-                },
-                label: Text("Current Position")),
-          ),
+          locationData("Latitude: " + latitude),
+          locationData("Longitude: " + longitude),
+          locationData("Altitude: " + altitude),
+          locationData("Accuracy: " + accuracy),
+          locationData("Bearing: " + bearing),
+          locationData("Speed: " + speed),
+          locationData("Time: " + time),
+          RaisedButton(
+              onPressed: () async {
+                await BackgroundLocation.setAndroidNotification(
+                  title: "Background service is running",
+                  message: "Background location in progress",
+                  icon: "@mipmap/ic_launcher",
+                );
+                await BackgroundLocation.setAndroidConfiguration(1000);
+                await BackgroundLocation.startLocationService();
+                BackgroundLocation.getLocationUpdates((location) {
+                  setState(() {
+                    this.latitude = location.latitude.toString();
+                    this.longitude = location.longitude.toString();
+                    this.accuracy = location.accuracy.toString();
+                    this.altitude = location.altitude.toString();
+                    this.bearing = location.bearing.toString();
+                    this.speed = location.speed.toString();
+                    this.time = DateTime.fromMillisecondsSinceEpoch(
+                            location.time.toInt())
+                        .toString();
+                  });
+                  print("""\n
+                        Latitude:  $latitude
+                        Longitude: $longitude
+                        Altitude: $altitude
+                        Accuracy: $accuracy
+                        Bearing:  $bearing
+                        Speed: $speed
+                        Time: $time
+                      """);
+                });
+              },
+              child: Text("Start Location Service")),
+          RaisedButton(
+              onPressed: () {
+                BackgroundLocation.stopLocationService();
+              },
+              child: Text("Stop Location Service")),
+          RaisedButton(
+              onPressed: () {
+                getCurrentLocation();
+              },
+              child: Text("Get Current Location")),
         ],
       ),
     );
   }
 
+  Widget locationData(String data) {
+    return Text(
+      data,
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  getCurrentLocation() {
+    BackgroundLocation().getCurrentLocation().then((location) {
+      print("This is current Location " + location.toMap().toString());
+    });
+  }
+
   @override
   void dispose() {
-    _controller.stopGettingLocation();
+    BackgroundLocation.stopLocationService();
     super.dispose();
   }
 }

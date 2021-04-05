@@ -1,3 +1,4 @@
+import 'package:accident_identifier/services/location_controller.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:background_location/background_location.dart';
 import 'package:flutter/material.dart';
@@ -9,81 +10,52 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String latitude = "waiting...";
-  String longitude = "waiting...";
-  String altitude = "waiting...";
-  String accuracy = "waiting...";
-  String bearing = "waiting...";
-  String speed = "waiting...";
-  String time = "waiting...";
+  LocationController _controller = Get.find<LocationController>();
 
   @override
   void initState() {
-    BackgroundLocation.getPermissions(
-      onGranted: () {},
-      onDenied: () {},
-    );
-
+    _controller.askForPermissions();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: ListView(
-        children: <Widget>[
-          locationData("Latitude: " + latitude),
-          locationData("Longitude: " + longitude),
-          locationData("Altitude: " + altitude),
-          locationData("Accuracy: " + accuracy),
-          locationData("Bearing: " + bearing),
-          locationData("Speed: " + speed),
-          locationData("Time: " + time),
-          RaisedButton(
+      child: Obx(() {
+        return ListView(
+          children: <Widget>[
+            locationData(
+                "Latitude: " + _controller.location.latitude.toString()),
+            locationData(
+                "Longitude: " + _controller.location.longitude.toString()),
+            locationData(
+                "Altitude: " + _controller.location.altitude.toString()),
+            locationData(
+                "Accuracy: " + _controller.location.accuracy.toString()),
+            locationData("Bearing: " + _controller.location.bearing.toString()),
+            locationData("Speed: " + _controller.location.speed.toString()),
+            locationData("Time: " + _controller.location.time.toString()),
+            RaisedButton(
+              child: Text("Start Location Service"),
               onPressed: () async {
-                await BackgroundLocation.setAndroidNotification(
-                  title: "Background service is running",
-                  message: "Background location in progress",
-                  icon: "@mipmap/ic_launcher",
-                );
-                await BackgroundLocation.setAndroidConfiguration(1000);
-                await BackgroundLocation.startLocationService();
-                BackgroundLocation.getLocationUpdates((location) {
-                  setState(() {
-                    this.latitude = location.latitude.toString();
-                    this.longitude = location.longitude.toString();
-                    this.accuracy = location.accuracy.toString();
-                    this.altitude = location.altitude.toString();
-                    this.bearing = location.bearing.toString();
-                    this.speed = location.speed.toString();
-                    this.time = DateTime.fromMillisecondsSinceEpoch(
-                            location.time.toInt())
-                        .toString();
-                  });
-                  print("""\n
-                        Latitude:  $latitude
-                        Longitude: $longitude
-                        Altitude: $altitude
-                        Accuracy: $accuracy
-                        Bearing:  $bearing
-                        Speed: $speed
-                        Time: $time
-                      """);
-                });
+                _controller.startLocationService();
               },
-              child: Text("Start Location Service")),
-          RaisedButton(
+            ),
+            RaisedButton(
+              child: Text("Stop Location Service"),
               onPressed: () {
-                BackgroundLocation.stopLocationService();
+                _controller.stopLocationService();
               },
-              child: Text("Stop Location Service")),
-          RaisedButton(
+            ),
+            RaisedButton(
+              child: Text("Get Current Location"),
               onPressed: () {
-                getCurrentLocation();
+                _controller.getCurrentLocation();
               },
-              child: Text("Get Current Location")),
-        ],
-      ),
+            )
+          ],
+        );
+      }),
     );
   }
 
@@ -98,15 +70,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  getCurrentLocation() {
-    BackgroundLocation().getCurrentLocation().then((location) {
-      print("This is current Location " + location.toMap().toString());
-    });
-  }
-
   @override
   void dispose() {
-    BackgroundLocation.stopLocationService();
+    _controller.stopLocationService();
     super.dispose();
   }
 }

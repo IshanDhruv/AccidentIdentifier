@@ -74,4 +74,21 @@ class ContactRepository {
       print(e);
     }
   }
+
+  Future<ApiResponse<bool>> notifyContacts() async {
+    String token = sharedPreferences.getString('userToken');
+    try {
+      String url = BaseUrl + NotifyGroup + NotifyContactsRoute;
+      var response = await http.get(Uri.parse(url), headers: {
+        HttpHeaders.authorizationHeader: '$token',
+      });
+      if (response.statusCode == 200) {
+        return ApiResponse.completed(true);
+      } else {
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 }

@@ -82,4 +82,11 @@ class UserController extends GetxController {
       return true;
     }
   }
+
+  Future notifyContacts() async {
+    final response = await _contactRepo.notifyContacts();
+    if (response.status == Status.COMPLETED) {
+      return true;
+    }
+  }
 }

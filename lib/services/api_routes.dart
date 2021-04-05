@@ -12,3 +12,6 @@ const String AddContactRoute = '/addone';
 
 const String HospitalGroup = '/hospital';
 const String AddHospitalRoute = '/addone';
+
+const String NotifyGroup = '/notify';
+const String NotifyContactsRoute = '/contacts';

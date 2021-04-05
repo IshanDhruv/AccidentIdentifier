@@ -92,7 +92,15 @@ class _ContactsScreenState extends State<ContactsScreen> {
             Builder(
               builder: (context) {
                 if (_state == 0)
-                  return _friendsUI();
+                  return Column(
+                    children: [
+                      OutlinedButton(
+                        onPressed: () => _controller.notifyContacts(),
+                        child: Text("Notify your contacts"),
+                      ),
+                      _friendsUI(),
+                    ],
+                  );
                 else
                   return _hospitalsUI();
               },

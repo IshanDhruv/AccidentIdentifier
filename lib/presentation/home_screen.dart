@@ -1,6 +1,5 @@
-import 'package:accident_identifier/services/location_controller.dart';
+import 'package:accident_identifier/services/controllers/location_controller.dart';
 import 'package:app_settings/app_settings.dart';
-import 'package:background_location/background_location.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

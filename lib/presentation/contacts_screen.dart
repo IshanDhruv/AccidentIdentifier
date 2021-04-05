@@ -1,5 +1,5 @@
 import 'package:accident_identifier/services/api_response.dart';
-import 'package:accident_identifier/services/user.dart';
+import 'package:accident_identifier/services/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

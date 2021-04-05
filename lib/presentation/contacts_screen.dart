@@ -132,41 +132,46 @@ class _ContactsScreenState extends State<ContactsScreen> {
             break;
           case Status.COMPLETED:
             var contacts = _controller.contacts.value;
-            return ListView.builder(
-                physics: ClampingScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: contacts.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onLongPress: () {
-                      _showDeleteDialog(_state, contacts[index].id);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(12),
+            if (contacts.isEmpty)
+              return Center(
+                child: Text("Please add some contacts."),
+              );
+            else
+              return ListView.builder(
+                  physics: ClampingScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: contacts.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onLongPress: () {
+                        _showDeleteDialog(_state, contacts[index].id);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: EdgeInsets.all(5),
+                        margin: EdgeInsets.all(5),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              contacts[index].name,
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(contacts[index].relation ?? 'Friend'),
+                                Text(contacts[index].phoneNumber ?? ''),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      padding: EdgeInsets.all(5),
-                      margin: EdgeInsets.all(5),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            contacts[index].name,
-                            style: TextStyle(fontSize: 24),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(contacts[index].relation ?? 'Friend'),
-                              Text(contacts[index].phoneNumber ?? ''),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                });
+                    );
+                  });
             break;
         }
         return Container();
@@ -197,43 +202,48 @@ class _ContactsScreenState extends State<ContactsScreen> {
             break;
           case Status.COMPLETED:
             var hospitals = _controller.hospitals.value;
-            return Container(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: hospitals.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onLongPress: () {
-                      _showDeleteDialog(_state, hospitals[index].id);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(12),
+            if (hospitals.isEmpty)
+              return Center(
+                child: Text("Please add a hospital."),
+              );
+            else
+              return Container(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: hospitals.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onLongPress: () {
+                        _showDeleteDialog(_state, hospitals[index].id);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: EdgeInsets.all(5),
+                        margin: EdgeInsets.all(5),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              hospitals[index].name,
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(hospitals[index].location ?? ''),
+                                Text(hospitals[index].phoneNumber ?? ''),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      padding: EdgeInsets.all(5),
-                      margin: EdgeInsets.all(5),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            hospitals[index].name,
-                            style: TextStyle(fontSize: 24),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(hospitals[index].location ?? ''),
-                              Text(hospitals[index].phoneNumber ?? ''),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            );
+                    );
+                  },
+                ),
+              );
             break;
         }
         return Container();

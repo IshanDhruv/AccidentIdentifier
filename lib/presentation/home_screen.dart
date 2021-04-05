@@ -66,19 +66,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     );
                 }),
-                RaisedButton(
+                ElevatedButton(
                   child: Text("Start Location Service"),
                   onPressed: () async {
                     _controller.startLocationService();
                   },
                 ),
-                RaisedButton(
+                ElevatedButton(
                   child: Text("Stop Location Service"),
                   onPressed: () {
                     _controller.stopLocationService();
                   },
                 ),
-                RaisedButton(
+                ElevatedButton(
                   child: Text("Get Current Location"),
                   onPressed: () {
                     _controller.getCurrentLocation();

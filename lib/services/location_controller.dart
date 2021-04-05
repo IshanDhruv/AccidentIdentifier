@@ -4,11 +4,16 @@ import 'package:get/get.dart';
 class LocationController extends GetxController {
   var locationObs = Location().obs;
   Location get location => locationObs.value;
+  var permission = true.obs;
 
-  askForPermissions() {
-    BackgroundLocation.getPermissions(
-      onGranted: () {},
-      onDenied: () {},
+  askForPermissions() async {
+    await BackgroundLocation.getPermissions(
+      onGranted: () {
+        permission.value = true;
+      },
+      onDenied: () {
+        permission.value = false;
+      },
     );
   }
 

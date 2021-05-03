@@ -14,6 +14,7 @@ class AuthRepository {
   Future signUp(
       String name, String email, String phoneNumber, String password) async {
     String url = BaseUrl + UserGroup + UserSignUpRoute;
+    String notifToken = sharedPreferences.getString('notifToken');
     var response = await http.post(Uri.parse(url),
         headers: {
           HttpHeaders.contentTypeHeader: "application/json",
@@ -23,6 +24,7 @@ class AuthRepository {
           'number': '+91' + phoneNumber,
           'password': password,
           'email': email,
+          "deviceToken": notifToken
         }));
     print(response.statusCode);
 
@@ -36,14 +38,13 @@ class AuthRepository {
 
   Future signIn(String email, String password) async {
     String url = BaseUrl + UserGroup + UserSignInRoute;
+    String notifToken = sharedPreferences.getString('notifToken');
     var response = await http.post(Uri.parse(url),
         headers: {
           HttpHeaders.contentTypeHeader: "application/json",
         },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }));
+        body: jsonEncode(
+            {'email': email, 'password': password, "deviceToken": notifToken}));
     print(response.statusCode);
     if (response.statusCode == 200) {
       var body = jsonDecode(response.body);

@@ -13,6 +13,7 @@ class AuthRepository {
 
   Future signUp(
       String name, String email, String phoneNumber, String password) async {
+    print("entered signUp route");
     String url = BaseUrl + UserGroup + UserSignUpRoute;
     String notifToken = sharedPreferences.getString('notifToken');
     var response = await http.post(Uri.parse(url),
@@ -37,6 +38,7 @@ class AuthRepository {
   }
 
   Future signIn(String email, String password) async {
+    print("entered signIn route");
     String url = BaseUrl + UserGroup + UserSignInRoute;
     String notifToken = sharedPreferences.getString('notifToken');
     var response = await http.post(Uri.parse(url),
@@ -55,6 +57,7 @@ class AuthRepository {
   }
 
   Future signOut() async {
+    print("entered signOut route");
     String url = BaseUrl + UserGroup + UserSignOutAllRoute;
     String token = sharedPreferences.getString('userToken');
     var response = await http.get(

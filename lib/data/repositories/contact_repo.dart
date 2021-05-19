@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 
 class ContactRepository {
   Future<ApiResponse<List<Contact>>> getContacts() async {
+    print("entered getContacts route");
     String token = sharedPreferences.getString('userToken');
     List<Contact> contacts;
     try {
@@ -33,6 +34,7 @@ class ContactRepository {
 
   Future<ApiResponse<bool>> addContact(
       String name, String email, String phoneNumber) async {
+    print("entered addContact route");
     try {
       String token = sharedPreferences.getString('userToken');
       String url = BaseUrl + ContactGroup + AddContactRoute;
@@ -76,12 +78,15 @@ class ContactRepository {
   }
 
   Future<ApiResponse<bool>> notifyContacts() async {
+    print("entered notifyContacts route");
     String token = sharedPreferences.getString('userToken');
     try {
       String url = BaseUrl + NotifyGroup + NotifyContactsRoute;
       var response = await http.get(Uri.parse(url), headers: {
         HttpHeaders.authorizationHeader: '$token',
       });
+      print(response.statusCode);
+      print(response.body);
       if (response.statusCode == 200) {
         return ApiResponse.completed(true);
       } else {
